@@ -27,6 +27,9 @@
 
 ; Use this signal code between two boards for their game ready
 .equ    SendReady = 0b11111111
+.equ    SendRock = 0b00000000
+.equ    SendPaper = 0b00000001
+.equ    SendScissors = 0b00000010
 
 .equ	DELAY_PRELOAD = 53817 ; 65536 - 11719
 .equ	DEBOUNCE_PRELOAD = 64364   ; Preload value for ~150ms debounce delay
@@ -54,8 +57,7 @@
 		reti
 
 .org	$0028 ; T/C interrupt 1
-		rcall Timer1_OVF_ISR
-		reti
+		rjmp TIMER1_OVF
 
 .org	$0032
 		rcall USART_Recieve
@@ -78,7 +80,8 @@ INIT:
 	out SPH, mpr
 
 	; set game state readying up
-	clr game_state
+	;clr game_state
+	clr mpr2
 
 	; Initialize Port B for output
 	ldi	mpr, $FF		; Set Port B Data Direction Register
@@ -115,10 +118,10 @@ INIT:
 	ldi mpr, (1<<USBS1 | 1<<UCSZ11 | 1<<UCSZ10)
 	sts UCSR1C, mpr
 
-	; initialize timer/counter 1
 
 	; Clear our flag variables
     rcall GAME_RESET
+	ldi game_state, 1
 
 	; copy all of our strings over and point Y at our LCD writes
 	rcall COPY_ALL_STRINGS
@@ -141,6 +144,9 @@ MAIN:
 	cpi game_state, 2
 	breq State_2
 
+	cpi game_state, 3
+	breq State_3
+
 	State_0:
 		ldi XL, low(welcome_string)
 		ldi XH, high(welcome_string)
@@ -161,32 +167,76 @@ MAIN:
 		breq MAIN_END ; no? jump to main
 
 		; at this point both players are ready
-		inc game_state
+		;inc game_state
 
 	State_1:
-		ldi XL, low(main_string)
-		ldi XH, high(main_string)
-		ldi YL, low(main_string)
-		ldi YH, high(main_string)
+		ldi XL, low(game_start_string)
+		ldi XH, high(game_start_string)
+		ldi YL, low(hand_string)
+		ldi YH, high(hand_string)
 
-		lds mpr, sixsec_flag ; is our 6s timer already running?
+		lds mpr, stage_first_run ; is our 6s timer already running?
 		sbrs mpr, 0
 		rcall Timer_1_Setup
+
+		State_1_Skip:
 		rjmp MAIN_END
 
 	State_2:
-		;lds mpr, third_stage_first_run
-		;tst mpr
-		;brne State_2_Skip
-		;ldi mpr, 1
-		;sts third_stage_first_run, mpr
-		;rcall Timer_1_Setup
+		State_2_Skip:
+		ldi XL, low(partner_string)
+		ldi XH, high(partner_string)
+		ldi YL, low(hand_string)
+		ldi YH, high(hand_string)
 
-		;State_2_Skip:
-		ldi XL, low(result_string)
-		ldi XH, high(result_string)
-		ldi YL, low(result_string)
-		ldi YH, high(result_string)
+		rjmp MAIN_END
+
+	State_3:
+		ldi YL, low(blank_string)
+		ldi YH, high(blank_string)
+
+		lds mpr, hand_state_byte
+		lds mpr2, partner_result
+		cp mpr, mpr2
+		brne Not_Draw
+
+		ldi XL, low(draw_string)
+		ldi XH, high(draw_string)
+		rjmp MAIN_END
+
+		Not_Draw:
+		cpi mpr, 1 ; did we select rock?
+		breq ROCK_SELECT
+		cpi mpr, 2 ; did we select paper?
+		breq PAPER_SELECT
+		cpi mpr, 3 ; did we select scissors?
+		breq SCISSORS_SELECT
+
+		ROCK_SELECT:
+		cpi mpr2, 3 ; did our opponent select scissors?
+		breq WIN_jmp ; yes? we won
+		breq LOSS_jmp ; no; we lost.
+
+		PAPER_SELECT:
+		cpi mpr2, 1 ; did our opponent select rock?
+		breq WIN_jmp
+		breq LOSS_jmp
+
+		SCISSORS_SELECT:
+		cpi mpr2, 2 ; did our opponent select paper?
+		breq WIN_jmp
+		breq LOSS_jmp
+
+
+		WIN_jmp:
+		ldi XL, low(win_string)
+		ldi XH, high(win_string)
+		rjmp MAIN_END
+
+		LOSS_jmp:
+		ldi XL, low(loss_string)
+		ldi XH, high(loss_string)
+		rjmp MAIN_END
 
 
 
@@ -210,24 +260,83 @@ USART_Transmit:
 USART_Recieve:
 	push mpr
 	lds buffer, UDR1
+	push XL
+	push XH
 
 	cpi buffer, SendReady ; did our opponent send a ready signal?
 	breq Partner_Ready
 
+	cpi buffer, SendRock ; did our opponent send a rock signal?
+	breq Rock_Sent
+
+	cpi buffer, SendPaper
+	breq Paper_Sent
+
+	cpi buffer, SendScissors
+	breq Scissors_Sent
 
 	Partner_Ready:
 		ldi mpr, 1
 		sts partner_ready_flag, mpr
+		rjmp Rx_End
 
+	Rock_Sent:
+		ldi mpr, SendRock
+		sts partner_result, mpr
+		ldi XL, low(rock_string)
+		ldi XH, high(rock_string)
+		rcall PARTNER_COPY_HAND
+		rjmp Rx_End
+	Paper_Sent:
+		ldi mpr, SendPaper
+		sts partner_result, mpr
+		ldi XL, low(paper_string)
+		ldi XH, high(paper_string)
+		rcall PARTNER_COPY_HAND
+		rjmp Rx_End
+	Scissors_Sent:
+		ldi mpr, SendScissors
+		sts partner_result, mpr
+		ldi XL, low(scissors_string)
+		ldi XH, high(scissors_string)
+		rcall PARTNER_COPY_HAND
+		rjmp Rx_End
+		
 
+	Rx_End:
+	pop XH
+	pop XL
 	pop mpr
 	ret
+
+PARTNER_COPY_HAND:
+	push mpr
+	push mpr2
+	push ZL
+	push ZH
+
+	ldi ZL, low(partner_string)
+	ldi ZH, high(partner_string)
+
+	ldi mpr2, 16
+	PARTNER_COPY_HAND_LOOP:
+	ld mpr, X+
+	st Z+, mpr
+	dec mpr2
+	brne PARTNER_COPY_HAND_LOOP
+
+	pop ZH
+	pop ZL
+	pop mpr2
+	pop mpr
+	ret
+
 
 
 Timer_1_Setup:
 ; --- Stop Timer1 first (in case it's already running) ---
 	ldi mpr, 1
-	sts sixsec_flag, mpr
+	sts stage_first_run, mpr
 
     sbi PORTB, 7
     sbi PORTB, 6
@@ -238,69 +347,99 @@ Timer_1_Setup:
 
     ; Preload Timer1 for a 1.5s delay
     ; (If needed, clear TOV1 by writing 1 to it in TIFR1)
-    ldi   mpr, low(DELAY_PRELOAD)
-    sts   TCNT1L, mpr
-    ldi   mpr, high(DELAY_PRELOAD)
-    sts   TCNT1H, mpr
-
     ; Normal mode, prescaler 1024, enable Timer1 Overflow Interrupt
-    clr   mpr
-    sts   TCCR1A, mpr
-    ldi   mpr, (1<<CS12) | (1<<CS10)
-    sts   TCCR1B, mpr
-    ldi   mpr, (1<<TOIE1)
-    sts   TIMSK1, mpr
+
+	ldi mpr, 0x00       ; Normal mode (WGM13:0 = 0000)
+    sts TCCR1A, mpr
+    
+    ; Preload timer to almost overflow immediately 
+    ; Using 65535 instead of DELAY_PRELOAD for first overflow
+    ldi mpr, 0xFF       ; 65535 (one count before overflow)
+    sts TCNT1L, mpr
+    ldi mpr, 0xFF
+    sts TCNT1H, mpr
+    
+	    
+    ; Start the timer with prescaler = 1024
+    ldi mpr, (1<<CS12) | (1<<CS10)  ; Prescaler = 1024
+    sts TCCR1B, mpr
+
+    ; Enable Timer/Counter 1 overflow interrupt
+    ldi mpr, (1<<TOIE1)
+    sts TIMSK1, mpr
+
+	ldi mpr, (1<<TOV1)
+	sts TIFR1, mpr
+
 
     ret
+
 ;------------------------------------------------------------------
 ; Timer/Counter1 Overflow ISR (LED Countdown Timer)
 ;------------------------------------------------------------------
-Timer1_OVF_ISR:
+
+TIMER1_OVF:
+    ; Preload timer for next 1.5s interval
+	ldi mpr, (1<<TOV1)
+	sts TIFR1, mpr
+
+    ldi mpr, low(DELAY_PRELOAD)
+    sts TCNT1L, mpr
+    ldi mpr, high(DELAY_PRELOAD)
+    sts TCNT1H, mpr
+    
+    ; Increment counter and check which LED to turn off next
     inc led_state
+    
     cpi led_state, 1
-    brne L1
-    cbi PORTB, 7
-    rjmp Reload
-
-L1:
+    breq TURN_OFF_PB7
     cpi led_state, 2
-    brne L2
-    cbi PORTB, 6
-    rjmp Reload
-
-L2:
+    breq TURN_OFF_PB6
     cpi led_state, 3
-    brne L3
-    cbi PORTB, 5
-    rjmp Reload
-
-L3:
+    breq TURN_OFF_PB5
     cpi led_state, 4
-    brne Reload
-    cbi PORTB, 4
-    ; Countdown finished, do whatever else you want here
-    ; e.g. disable Timer1 or move to next game state
-    ; clr TCCR1B / TIMSK1 if you want to stop repeats
-	clr   mpr
-    sts   TCCR1B, mpr
-	sts   TIMSK1, mpr
-	ldi r16, (1<<TOV1)
-    out TIFR1, r16
+    breq TURN_OFF_PB4
+    
+    ; Check if it's time to reset
+    cpi led_state, 5       ; After 6 seconds (4 LEDs off)
+    brsh RESET_SEQUENCE  ; Reset if counter >= 5
+    reti
+
+RESET_SEQUENCE:
+    ; Reset the sequence - turn all LEDs back on
 	inc game_state
-    ret
+	clr mpr
+	sts stage_first_run, mpr
+	cpi game_state, 4
+	brne FULL_RESET_SKIP
+	rcall GAME_RESET
+	rjmp RESET_SKIP
 
-Reload:
-    ; Clear TOV1 if needed
-    ldi r16, (1<<TOV1)
-    sts TIFR1, r16
+	FULL_RESET_SKIP:
+    sbi PORTB, 7
+    sbi PORTB, 6
+    sbi PORTB, 5
+    sbi PORTB, 4
+    ldi led_state, 0       ; Reset counter
 
-    ; Reload Timer1
-    ldi   r16, low(DELAY_PRELOAD)
-    sts   TCNT1L, r16
-    ldi   r16, high(DELAY_PRELOAD)
-    sts   TCNT1H, r16
-    ret
+	RESET_SKIP:
+    reti
 
+TURN_OFF_PB7:
+    cbi PORTB, 7
+    reti
+    
+TURN_OFF_PB6:
+    cbi PORTB, 6
+    reti
+    
+TURN_OFF_PB5:
+    cbi PORTB, 5
+    reti
+    
+TURN_OFF_PB4:
+    cbi PORTB, 4
+    reti
 
 
 GAME_RESET:
@@ -311,7 +450,11 @@ GAME_RESET:
     sts sixsec_flag, mpr
 	sts ready_flag, mpr
 	sts partner_ready_flag, mpr
-	sts third_stage_first_run, mpr
+	sts stage_first_run, mpr
+	sts hand_state_byte, mpr
+	sts TCCR1B, mpr
+	sts TIMSK1, mpr
+
 	ret
 
 PD4_ISR:
@@ -339,11 +482,76 @@ PD4_ISR:
     ldi   mpr, (1<<TOIE3)
     sts   TIMSK3, mpr
 
+	cpi game_state, 1 ; are we in the main  phase
+	brne PD4_exit ; if not, skip
+
+	lds mpr, hand_state_byte
+	inc mpr
+	cpi mpr, 3
+	brne choose_start
+	clr mpr
+
+	choose_start:
+	push XL
+	push XH
+	
+	cpi mpr, 0
+	breq choose_rock
+
+	cpi mpr, 1
+	breq choose_paper
+
+	cpi mpr, 2
+	breq choose_scissors
+
+
+	choose_rock:
+	ldi XL, low(rock_string)
+	ldi XH, high(rock_string)
+	rjmp choose_end
+
+	choose_paper:
+	ldi XL, low(paper_string)
+	ldi XH, high(paper_string)
+	rjmp choose_end
+
+	choose_scissors:
+	ldi XL, low(scissors_string)
+	ldi XH, high(scissors_string)
+	rjmp choose_end
+
+	choose_end:
+	sts hand_state_byte, mpr
+	rcall COPY_HAND
+	pop XH
+	pop XL
     
 
 PD4_exit:
 	pop   mpr
     ret
+
+COPY_HAND:
+	push mpr
+	push mpr2
+	push ZL
+	push ZH
+
+	ldi ZL, low(hand_string)
+	ldi ZH, high(hand_string)
+
+	ldi mpr2, 16
+	COPY_HAND_LOOP:
+	ld mpr, X+
+	st Z+, mpr
+	dec mpr2
+	brne COPY_HAND_LOOP
+
+	pop ZH
+	pop ZL
+	pop mpr2
+	pop mpr
+	ret
 
 PD7_ISR:
 	push mpr
@@ -382,6 +590,7 @@ Timer3_OVF_ISR:
 
 COPY_TO_LCD:
 	push mpr
+	push mpr2
 
 	rcall LCDClr
 	ldi ZL, low(0x0100)
@@ -405,6 +614,7 @@ COPY_TO_LCD:
 	dec mpr2
 	brne BOTTOM_LOOP
 
+	pop mpr2
 	pop mpr
 	rcall LCDWrite
 	ret
@@ -441,16 +651,70 @@ COPY_ALL_STRINGS:
     rcall Copy16BytesFromProgmem
 
     ; Copy main_string (16 bytes)
-    ldi   ZL, low(MAIN_PHASE_START * 2)
-    ldi   ZH, high(MAIN_PHASE_START * 2)
-    ldi   YL, low(main_string)
-    ldi   YH, high(main_string)
+    ldi   ZL, low(GAME_START * 2)
+    ldi   ZH, high(GAME_START * 2)
+    ldi   YL, low(game_start_string)
+    ldi   YH, high(game_start_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(ROCK * 2)
+    ldi   ZH, high(ROCK * 2)
+    ldi   YL, low(rock_string)
+    ldi   YH, high(rock_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(ROCK * 2)
+    ldi   ZH, high(ROCK * 2)
+    ldi   YL, low(hand_string)
+    ldi   YH, high(hand_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(PAPER * 2)
+    ldi   ZH, high(PAPER * 2)
+    ldi   YL, low(paper_string)
+    ldi   YH, high(paper_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(SCISSORS * 2)
+    ldi   ZH, high(SCISSORS * 2)
+    ldi   YL, low(scissors_string)
+    ldi   YH, high(scissors_string)
     rcall Copy16BytesFromProgmem
 
 	ldi   ZL, low(RESULTS_START * 2)
     ldi   ZH, high(RESULTS_START * 2)
     ldi   YL, low(result_string)
     ldi   YH, high(result_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(BLANK * 2)
+    ldi   ZH, high(BLANK * 2)
+    ldi   YL, low(partner_string)
+    ldi   YH, high(partner_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(BLANK * 2)
+    ldi   ZH, high(BLANK * 2)
+    ldi   YL, low(blank_string)
+    ldi   YH, high(blank_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(DRAW * 2)
+    ldi   ZH, high(DRAW * 2)
+    ldi   YL, low(draw_string)
+    ldi   YH, high(draw_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(WIN * 2)
+    ldi   ZH, high(WIN * 2)
+    ldi   YL, low(win_string)
+    ldi   YH, high(win_string)
+    rcall Copy16BytesFromProgmem
+
+	ldi   ZL, low(LOSS * 2)
+    ldi   ZH, high(LOSS * 2)
+    ldi   YL, low(loss_string)
+    ldi   YH, high(loss_string)
     rcall Copy16BytesFromProgmem
 
     ret
@@ -473,13 +737,25 @@ debounce_flag: .byte 1
 sixsec_flag: .byte 1
 ready_flag: .byte 1
 partner_ready_flag: .byte 1
-third_stage_first_run: .byte 1
+stage_first_run: .byte 1
+hand_state_byte: .byte 1
 welcome_string: .byte 16
 press_pd7_string: .byte 16
 ready_string_one: .byte 16
 ready_string_two: .byte 16
-main_string: .byte 16
+game_start_string: .byte 16
+rock_string: .byte 16
+paper_string: .byte 16
+scissors_string: .byte 16
+hand_string: .byte 16
+partner_string: .byte 16
+partner_result: .byte 1
 result_string: .byte 16
+draw_string: .byte 16
+win_string: .byte 16
+loss_string: .byte 16
+blank_string: .byte 16
+
 ;-----------------------------------------------------------
 ; An example of storing a string. Note the labels before and
 ; after the .DB directive; these can help to access the data
@@ -497,11 +773,32 @@ READY_LINE_ONE_START:
 READY_LINE_TWO_START:
 	.DB		"for the opponent"
 
-MAIN_PHASE_START:
-	.DB		"MAIN PHASE      "
+GAME_START:
+	.DB		"GAME START      "
+
+ROCK:
+	.DB		"ROCK            "
+
+PAPER:
+	.DB		"PAPER           "
+
+SCISSORS:
+	.DB		"SCISSORS        "
 
 RESULTS_START:
 	.DB		"Result Stage    "
+
+BLANK:
+	.DB		"                "
+
+DRAW:
+	.DB		"Draw.           "
+
+WIN:
+	.DB		"You Won!        "
+
+LOSS:
+	.DB		"You lost        "
 
 ;***********************************************************
 ;*	Additional Program Includes

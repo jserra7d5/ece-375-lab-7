@@ -72,6 +72,9 @@
     <Compile Include="LCDDriver.asm">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="test.asm">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Assembler.targets" />
 </Project>
