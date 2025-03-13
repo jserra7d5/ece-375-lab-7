@@ -1,0 +1,112 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.7</VERSION>
+ <DEVICE>"ATmega32U4"</DEVICE>
+ <WORKING_DIR>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\avrasm\inc\m32u4def.inc</FILE>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\avrasm\inc\m32U4def.inc</FILE>
+  <FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Debug\ece-375-lab-7.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>ece-375-lab-7.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>ece-375-lab-7.map</FILE>
+  <FILE>ece-375-lab-7.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <INIT><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>73</LINE></INIT>
+  <PD4_ISR><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>279</LINE></PD4_ISR>
+  <PD7_ISR><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>370</LINE></PD7_ISR>
+  <Timer1_OVF_ISR><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>223</LINE></Timer1_OVF_ISR>
+  <USART_Recieve><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>204</LINE></USART_Recieve>
+  <Timer3_OVF_ISR><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>387</LINE></Timer3_OVF_ISR>
+  <debounce_flag><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>486</LINE></debounce_flag>
+  <sixsec_flag><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>487</LINE></sixsec_flag>
+  <ready_flag><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>488</LINE></ready_flag>
+  <partner_ready_flag><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>489</LINE></partner_ready_flag>
+  <COPY_ALL_STRINGS><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>435</LINE></COPY_ALL_STRINGS>
+  <LCDInit><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>71</LINE></LCDInit>
+  <LCDClr><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>187</LINE></LCDClr>
+  <MAIN><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>152</LINE></MAIN>
+  <State_0><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>163</LINE></State_0>
+  <welcome_string><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>490</LINE></welcome_string>
+  <press_pd7_string><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>491</LINE></press_pd7_string>
+  <MAIN_END><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>187</LINE></MAIN_END>
+  <ready_string_one><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>492</LINE></ready_string_one>
+  <ready_string_two><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>493</LINE></ready_string_two>
+  <State_1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>185</LINE></State_1>
+  <COPY_TO_LCD><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>405</LINE></COPY_TO_LCD>
+  <USART_Transmit><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>195</LINE></USART_Transmit>
+  <Partner_Ready><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>212</LINE></Partner_Ready>
+  <LED_Check2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>234</LINE></LED_Check2>
+  <Reload_Timer1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>266</LINE></Reload_Timer1>
+  <LED_Check3><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>241</LINE></LED_Check3>
+  <LED_Check4><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>248</LINE></LED_Check4>
+  <LED_Reload><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>254</LINE></LED_Reload>
+  <PD4_exit><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>366</LINE></PD4_exit>
+  <Pre_Timer><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>307</LINE></Pre_Timer>
+  <Ready_Wait><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>300</LINE></Ready_Wait>
+  <Main_Phase><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>362</LINE></Main_Phase>
+  <PD7_exit><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>383</LINE></PD7_exit>
+  <TOP_LOOP><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>413</LINE></TOP_LOOP>
+  <BOTTOM_LOOP><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>423</LINE></BOTTOM_LOOP>
+  <LCDWrite><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>140</LINE></LCDWrite>
+  <WELCOME_START><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>499</LINE></WELCOME_START>
+  <Copy16BytesFromProgmem><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>473</LINE></Copy16BytesFromProgmem>
+  <PRESS_PD7_START><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>503</LINE></PRESS_PD7_START>
+  <READY_LINE_ONE_START><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>507</LINE></READY_LINE_ONE_START>
+  <READY_LINE_TWO_START><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>511</LINE></READY_LINE_TWO_START>
+  <MAIN_PHASE_START><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>515</LINE></MAIN_PHASE_START>
+  <main_string><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>494</LINE></main_string>
+  <Copy16Loop><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>475</LINE></Copy16Loop>
+  <WELCOME_END><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>501</LINE></WELCOME_END>
+  <PRESS_PD7_END><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>505</LINE></PRESS_PD7_END>
+  <READY_LINE_ONE_END><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>509</LINE></READY_LINE_ONE_END>
+  <READY_LINE_TWO_END><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>513</LINE></READY_LINE_TWO_END>
+  <MAIN_PHASE_END><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\Joseph_Serra_and_Darren_Mai_sourcecode.asm</FILE><LINE>517</LINE></MAIN_PHASE_END>
+  <LCDDelay><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>501</LINE></LCDDelay>
+  <LCD_Internal_WriteCMD><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>485</LINE></LCD_Internal_WriteCMD>
+  <LCDBacklightOn><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>123</LINE></LCDBacklightOn>
+  <LCDBacklightOff><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>131</LINE></LCDBacklightOff>
+  <LCDWrLn1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>149</LINE></LCDWrLn1>
+  <LCDWrLn2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>168</LINE></LCDWrLn2>
+  <LCD_Internal_WriteLn><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>337</LINE></LCD_Internal_WriteLn>
+  <LCDClrLn1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>252</LINE></LCDClrLn1>
+  <LCDClrLn2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>265</LINE></LCDClrLn2>
+  <CLRDM1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>198</LINE></CLRDM1>
+  <CLRloop1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>209</LINE></CLRloop1>
+  <CLRDM2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>226</LINE></CLRDM2>
+  <CLRloop2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>237</LINE></CLRloop2>
+  <LCD_Internal_ClearLn><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>429</LINE></LCD_Internal_ClearLn>
+  <Bin2ASCII><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>284</LINE></Bin2ASCII>
+  <B2A_1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>297</LINE></B2A_1>
+  <B2A_3><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>307</LINE></B2A_3>
+  <B2A_2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>303</LINE></B2A_2>
+  <div10><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>524</LINE></div10>
+  <FontBitmap><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>593</LINE></FontBitmap>
+  <LCD_WL_display_bank><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>357</LINE></LCD_WL_display_bank>
+  <LCD_WL_next_char><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>370</LINE></LCD_WL_next_char>
+  <LCD_WL_next_col><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>383</LINE></LCD_WL_next_col>
+  <LCD_WL_wait_spi><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>388</LINE></LCD_WL_wait_spi>
+  <LCD_WL_all_done><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>410</LINE></LCD_WL_all_done>
+  <LCD_CLRLN_clear_bank><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>438</LINE></LCD_CLRLN_clear_bank>
+  <LCD_CLRLN_write_col><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>453</LINE></LCD_CLRLN_write_col>
+  <LCD_CLRLN_wait_spi><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>455</LINE></LCD_CLRLN_wait_spi>
+  <LCD_CLRLN_all_done><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>469</LINE></LCD_CLRLN_all_done>
+  <LCD_IWC_L1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>490</LINE></LCD_IWC_L1>
+  <LCDDelay_L1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>505</LINE></LCDDelay_L1>
+  <LCDDelay_L2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>507</LINE></LCDDelay_L2>
+  <div10_1><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>563</LINE></div10_1>
+  <div10_2><FILE>C:\Users\redst\Desktop\Classes\ECE 375\ece-375-lab-7\ece-375-lab-7\LCDDriver.asm</FILE><LINE>570</LINE></div10_2>
+ </LABELS>
+</ASSEMBLER_INFO>
