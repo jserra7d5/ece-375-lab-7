@@ -32,7 +32,7 @@
 .equ	DEBOUNCE_PRELOAD = 64364   ; Preload value for ~150ms debounce delay
 
 .equ	Button_4 = 0 ; jump PD4 to PD0
-.equ    Button_7 = 3
+.equ    Button_7 = 1 ; jump PD7 to PD3
 
 ;***********************************************************
 ;*  Start of Code Segment
@@ -49,7 +49,7 @@
 		rcall PD4_ISR
 		reti
 
-.org	$0008
+.org	$0004
 		rcall PD7_ISR
 		reti
 
@@ -93,7 +93,7 @@ INIT:
 	out	PORTD, mpr
 
 	; initialize button interrupts
-	ldi mpr, 0b10000010
+	ldi mpr, 0b00001010
 	sts EICRA, mpr
 
 	ldi mpr, (1<<Button_4 | 1<<Button_7)
@@ -116,33 +116,14 @@ INIT:
 	sts UCSR1C, mpr
 
 	; initialize timer/counter 1
-	clr mpr
-	sts TCCR1A, mpr
-
-	ldi mpr, (1<<CS12 | 1<<CS10)
-	sts TCCR1B, mpr
-
-	ldi mpr, low(DELAY_PRELOAD)
-	sts TCNT1L, mpr
-	ldi mpr, high(DELAY_PRELOAD)
-	sts TCNT1H, mpr
-
-	ldi mpr, (1<<TOIE1)
-	sts TIMSK1, mpr
 
 	; Clear our flag variables
-    ldi mpr, 0
-    sts debounce_flag, mpr
-    sts sixsec_flag, mpr
-	sts ready_flag, mpr
-	sts partner_ready_flag, mpr
+    rcall GAME_RESET
 
 	; copy all of our strings over and point Y at our LCD writes
 	rcall COPY_ALL_STRINGS
 	rcall LCDInit
 	rcall LCDClr
-
-
 	sei
 
 
@@ -154,11 +135,11 @@ MAIN:
 	breq State_0
 	
 
-	;cpi game_state, 1
-	;breq State_1
+	cpi game_state, 1
+	breq State_1
 
-	;cpi game_state, 2
-	;breq State_2
+	cpi game_state, 2
+	breq State_2
 
 	State_0:
 		ldi XL, low(welcome_string)
@@ -183,6 +164,31 @@ MAIN:
 		inc game_state
 
 	State_1:
+		ldi XL, low(main_string)
+		ldi XH, high(main_string)
+		ldi YL, low(main_string)
+		ldi YH, high(main_string)
+
+		lds mpr, sixsec_flag ; is our 6s timer already running?
+		sbrs mpr, 0
+		rcall Timer_1_Setup
+		rjmp MAIN_END
+
+	State_2:
+		;lds mpr, third_stage_first_run
+		;tst mpr
+		;brne State_2_Skip
+		;ldi mpr, 1
+		;sts third_stage_first_run, mpr
+		;rcall Timer_1_Setup
+
+		;State_2_Skip:
+		ldi XL, low(result_string)
+		ldi XH, high(result_string)
+		ldi YL, low(result_string)
+		ldi YH, high(result_string)
+
+
 
 	MAIN_END:
 		rcall COPY_TO_LCD
@@ -217,64 +223,96 @@ USART_Recieve:
 	pop mpr
 	ret
 
+
+Timer_1_Setup:
+; --- Stop Timer1 first (in case it's already running) ---
+	ldi mpr, 1
+	sts sixsec_flag, mpr
+
+    sbi PORTB, 7
+    sbi PORTB, 6
+    sbi PORTB, 5
+    sbi PORTB, 4
+
+    clr led_state   ; led_state = 0
+
+    ; Preload Timer1 for a 1.5s delay
+    ; (If needed, clear TOV1 by writing 1 to it in TIFR1)
+    ldi   mpr, low(DELAY_PRELOAD)
+    sts   TCNT1L, mpr
+    ldi   mpr, high(DELAY_PRELOAD)
+    sts   TCNT1H, mpr
+
+    ; Normal mode, prescaler 1024, enable Timer1 Overflow Interrupt
+    clr   mpr
+    sts   TCCR1A, mpr
+    ldi   mpr, (1<<CS12) | (1<<CS10)
+    sts   TCCR1B, mpr
+    ldi   mpr, (1<<TOIE1)
+    sts   TIMSK1, mpr
+
+    ret
 ;------------------------------------------------------------------
 ; Timer/Counter1 Overflow ISR (LED Countdown Timer)
 ;------------------------------------------------------------------
 Timer1_OVF_ISR:
-    ; Increment the LED countdown state.
-    inc   led_state
+    inc led_state
+    cpi led_state, 1
+    brne L1
+    cbi PORTB, 7
+    rjmp Reload
 
-    ; Turn off LEDs one by one based on the current state.
-    cpi   led_state, 1
-    brne  LED_Check2
-    ; State 1: Turn off LED on PB7.
-    cbi   PORTB, 7
-    rjmp  Reload_Timer1
+L1:
+    cpi led_state, 2
+    brne L2
+    cbi PORTB, 6
+    rjmp Reload
 
-LED_Check2:
-    cpi   led_state, 2
-    brne  LED_Check3
-    ; State 2: Turn off LED on PB6.
-    cbi   PORTB, 6
-    rjmp  Reload_Timer1
+L2:
+    cpi led_state, 3
+    brne L3
+    cbi PORTB, 5
+    rjmp Reload
 
-LED_Check3:
-    cpi   led_state, 3
-    brne  LED_Check4
-    ; State 3: Turn off LED on PB5.
-    cbi   PORTB, 5
-    rjmp  Reload_Timer1
+L3:
+    cpi led_state, 4
+    brne Reload
+    cbi PORTB, 4
+    ; Countdown finished, do whatever else you want here
+    ; e.g. disable Timer1 or move to next game state
+    ; clr TCCR1B / TIMSK1 if you want to stop repeats
+	clr   mpr
+    sts   TCCR1B, mpr
+	sts   TIMSK1, mpr
+	ldi r16, (1<<TOV1)
+    out TIFR1, r16
+	inc game_state
+    ret
 
-LED_Check4:
-    cpi   led_state, 4
-    brne  LED_Reload
-    ; State 4: Turn off LED on PB4.
-    cbi   PORTB, 4
+Reload:
+    ; Clear TOV1 if needed
+    ldi r16, (1<<TOV1)
+    sts TIFR1, r16
 
-LED_Reload:
-    ; If all LEDs have been turned off, stop Timer1.
-    cpi   led_state, 4
-    brlo  Reload_Timer1            ; If state < 4, continue countdown.
-    ; Otherwise, disable Timer1 by clearing its clock.
-    clr   r16
-    sts   TCCR1B, r16
-    clr   r16
-    sts   TIMSK1, r16             ; Also disable Timer1 interrupt.
-	ldi   mpr, 0
-    sts   sixsec_flag, mpr
-
-Reload_Timer1:
-    ; Reload Timer1 for the next 1.5s interval (if any).
-	push mpr
-
+    ; Reload Timer1
     ldi   r16, low(DELAY_PRELOAD)
     sts   TCNT1L, r16
     ldi   r16, high(DELAY_PRELOAD)
     sts   TCNT1H, r16
+    ret
 
-	pop mpr
 
-    ret                        ; Return from Timer1 ISR
+
+GAME_RESET:
+	clr game_state
+	clr buffer
+	clr mpr
+    sts debounce_flag, mpr
+    sts sixsec_flag, mpr
+	sts ready_flag, mpr
+	sts partner_ready_flag, mpr
+	sts third_stage_first_run, mpr
+	ret
 
 PD4_ISR:
 	push mpr
@@ -285,33 +323,6 @@ PD4_ISR:
 
     ldi   mpr, 1
     sts   debounce_flag, mpr
-
-	cpi game_state, 0 ; are we in the ready-up phase?
-	brne Pre_Timer
-
-	lds mpr, ready_flag
-	tst mpr ; have we readied up yet?
-	brne Ready_Wait
-
-	; if not, then ready up
-	ldi   mpr, 1
-    sts   ready_flag, mpr
-
-	Ready_Wait:
-	lds mpr, partner_ready_flag
-	tst mpr
-	breq PD4_exit
-	; at this point both boards have readied up.
-
-	; state encoding is as follows: Rock/Paper/Scissors = 0/1/2
-	Pre_Timer:
-
-	lds   mpr, sixsec_flag
-    tst   mpr
-    brne  Main_Phase
-
-	ldi   mpr, 1
-    sts   sixsec_flag, mpr
 
     ; --- Start debounce using Timer3 ---
     ldi   mpr, low(DEBOUNCE_PRELOAD)
@@ -327,39 +338,6 @@ PD4_ISR:
 
     ldi   mpr, (1<<TOIE3)
     sts   TIMSK3, mpr
-
-    ; --- Stop Timer1 first (in case it's already running) ---
-    clr   mpr
-    sts   TCCR1B, mpr
-
-    ; --- Restart LED countdown ---
-    clr   led_state         ; Reset LED countdown state
-
-    ; Turn all four LEDs on (active high on PORTB, bits 7..4)
-    sbi   PORTB, 7
-    sbi   PORTB, 6
-    sbi   PORTB, 5
-    sbi   PORTB, 4
-
-    ; Preload Timer/Counter1 for a 1.5s delay.
-    ldi   mpr, low(DELAY_PRELOAD)
-    sts   TCNT1L, mpr
-    ldi   mpr, high(DELAY_PRELOAD)
-    sts   TCNT1H, mpr
-
-    ; Ensure Timer1 is in normal mode (TCCR1A = 0)
-    clr   mpr
-    sts   TCCR1A, mpr
-
-    ; Start Timer1 with a 1024 prescaler
-    ldi   mpr, (1<<CS12) | (1<<CS10)   ; 1024 prescaler for Timer1
-    sts   TCCR1B, mpr
-
-    ; Enable Timer/Counter1 Overflow Interrupt.
-    ldi   mpr, (1<<TOIE1)
-    sts   TIMSK1, mpr
-
-	Main_Phase:
 
     
 
@@ -406,8 +384,8 @@ COPY_TO_LCD:
 	push mpr
 
 	rcall LCDClr
-	ldi ZL, low($0100)
-	ldi ZH, high($0100)
+	ldi ZL, low(0x0100)
+	ldi ZH, high(0x0100)
 
 	ldi mpr2, 16
 	TOP_LOOP:
@@ -416,8 +394,9 @@ COPY_TO_LCD:
 	dec mpr2
 	brne TOP_LOOP
 
-	ldi ZL, low($0110)
-	ldi ZH, high($0110)
+
+	ldi ZL, low(0x0110)
+	ldi ZH, high(0x0110)
 
 	ldi mpr2, 16
 	BOTTOM_LOOP:
@@ -468,6 +447,12 @@ COPY_ALL_STRINGS:
     ldi   YH, high(main_string)
     rcall Copy16BytesFromProgmem
 
+	ldi   ZL, low(RESULTS_START * 2)
+    ldi   ZH, high(RESULTS_START * 2)
+    ldi   YL, low(result_string)
+    ldi   YH, high(result_string)
+    rcall Copy16BytesFromProgmem
+
     ret
 
 Copy16BytesFromProgmem:
@@ -483,38 +468,40 @@ Copy16Loop:
 ;*	Stored Program Data
 ;***********************************************************
 .dseg
+.org 0x0200           
 debounce_flag: .byte 1
 sixsec_flag: .byte 1
 ready_flag: .byte 1
 partner_ready_flag: .byte 1
+third_stage_first_run: .byte 1
 welcome_string: .byte 16
 press_pd7_string: .byte 16
 ready_string_one: .byte 16
 ready_string_two: .byte 16
 main_string: .byte 16
+result_string: .byte 16
 ;-----------------------------------------------------------
 ; An example of storing a string. Note the labels before and
 ; after the .DB directive; these can help to access the data
 ;-----------------------------------------------------------
+.cseg
 WELCOME_START:
     .DB		"Welcome!        "		; Declaring data in ProgMem
-WELCOME_END:
 
 PRESS_PD7_START:
 	.DB		"Please press PD7"
-PRESS_PD7_END:
 
 READY_LINE_ONE_START:
 	.DB		"READY. Waiting  "
-READY_LINE_ONE_END:
 
 READY_LINE_TWO_START:
 	.DB		"for the opponent"
-READY_LINE_TWO_END:
 
 MAIN_PHASE_START:
 	.DB		"MAIN PHASE      "
-MAIN_PHASE_END:
+
+RESULTS_START:
+	.DB		"Result Stage    "
 
 ;***********************************************************
 ;*	Additional Program Includes
