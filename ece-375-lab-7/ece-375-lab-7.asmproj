@@ -15,7 +15,7 @@
     <Name>ece-375-lab-7</Name>
     <RootNamespace>ece-375-lab-7</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
-    <EntryFile>$(MSBuildProjectDirectory)\test.asm</EntryFile>
+    <EntryFile>$(MSBuildProjectDirectory)\Joseph_Serra_and_Darren_Mai_sourcecode.asm</EntryFile>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>
@@ -70,9 +70,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="LCDDriver.asm">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="test.asm">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

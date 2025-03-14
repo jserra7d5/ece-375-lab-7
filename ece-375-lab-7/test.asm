@@ -121,7 +121,7 @@ INIT:
 	sts UCSR1C, mpr
 
 	; Clear our flag variables
-    rcall GAME_RESET
+    
 	;ldi game_state, 1
 
 	ldi		mpr, 0
@@ -133,6 +133,7 @@ INIT:
 	rcall COPY_ALL_STRINGS
 	rcall LCDInit
 	rcall LCDClr
+	rcall GAME_RESET
 	sei
 
 
@@ -209,8 +210,8 @@ MAIN:
 		rcall WAIT_ONE_AND_HALF
 
 	State_3:
-		ldi YL, low(blank_string)
-		ldi YH, high(blank_string)
+		ldi YL, low(hand_string)
+		ldi YH, high(hand_string)
 
 		lds mpr, hand_state_byte
 		lds mpr2, partner_result
@@ -222,27 +223,27 @@ MAIN:
 		rjmp State_3_End
 
 		Not_Draw:
-		cpi mpr, 1 ; did we select rock?
+		cpi mpr, 0 ; did we select rock?
 		breq ROCK_SELECT
-		cpi mpr, 2 ; did we select paper?
+		cpi mpr, 1 ; did we select paper?
 		breq PAPER_SELECT
-		cpi mpr, 3 ; did we select scissors?
+		cpi mpr, 2 ; did we select scissors?
 		breq SCISSORS_SELECT
 
 		ROCK_SELECT:
-		cpi mpr2, 3 ; did our opponent select scissors?
+		cpi mpr2, 2 ; did our opponent select scissors?
 		breq WIN_jmp ; yes? we won
-		breq LOSS_jmp ; no; we lost.
+		rjmp LOSS_jmp ; no; we lost.
 
 		PAPER_SELECT:
-		cpi mpr2, 1 ; did our opponent select rock?
+		cpi mpr2, 0 ; did our opponent select rock?
 		breq WIN_jmp
-		breq LOSS_jmp
+		rjmp LOSS_jmp
 
 		SCISSORS_SELECT:
-		cpi mpr2, 2 ; did our opponent select paper?
+		cpi mpr2, 1 ; did our opponent select paper?
 		breq WIN_jmp
-		breq LOSS_jmp
+		rjmp LOSS_jmp
 
 
 		WIN_jmp:
@@ -270,26 +271,6 @@ MAIN:
 		rcall WAIT_ONE_AND_HALF
 		cbi PORTB, 4
 		rcall WAIT_ONE_AND_HALF
-		; debugging
-
-		lsl mpr
-		lsl mpr
-		lsl mpr
-		lsl mpr
-		lsl mpr
-		lsl mpr
-
-		lsl mpr2
-		lsl mpr2
-		lsl mpr2
-		lsl mpr2
-		or mpr, mpr2
-		in mpr2, PORTB
-		andi mpr2, 0x0F
-		or mpr2, mpr
-		out PORTB, mpr2
-
-		; debugging
 
 		rcall GAME_RESET
 
@@ -454,15 +435,25 @@ PD4_ISR:
 
 	lds mpr , hand_state_byte
 	inc mpr ; if 2, goes to 3~ invalid option
-	cpi mpr, 3
-	breq choose_rock
+	
+	lds     mpr, hand_state_byte  ; load current choice (0=Rock, 1=Paper, 2=Scissors)
+    inc     mpr                   ; increment: 0->1, 1->2, 2->3
+    cpi     mpr, 3              ; if result is 3...
+    brlo    ContinueCycle       ; ...then leave it as is (it’s either 1 or 2)
+    clr     mpr                 ; if mpr equals 3, wrap-around to 0 (Rock)
+	ContinueCycle:
+    sts     hand_state_byte, mpr  ; store updated value back
 
-	cpi mpr, 1
-	breq choose_paper
-	breq choose_scissors
+    ; --- Branch based on new value ---
+    cpi     mpr, 0              ; if new value is 0 ? Rock
+    breq    choose_rock
+    cpi     mpr, 1              ; if new value is 1 ? Paper
+    breq    choose_paper
+    cpi     mpr, 2              ; if new value is 2 ? Scissors
+    breq    choose_scissors
+    rjmp    choose_scissors    ; fallback
 
 	choose_rock:
-	clr mpr
 	ldi YL, low(rock_string)
 	ldi YH, high(rock_string)
 	rjmp PD4_Pre_Copy
