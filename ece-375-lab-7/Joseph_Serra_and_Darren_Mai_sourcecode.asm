@@ -118,6 +118,12 @@ INIT:
 	ldi mpr, (1<<USBS1 | 1<<UCSZ11 | 1<<UCSZ10)
 	sts UCSR1C, mpr
 
+	clr mpr ; set normal mode
+	sts	TCCR1A, mpr 
+
+	ldi	mpr, 0b00000100 ; set precale to 256
+	sts	TCCR1B, mpr
+
 
 	; Clear our flag variables
     rcall GAME_RESET
